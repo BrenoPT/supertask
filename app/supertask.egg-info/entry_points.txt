@@ -1,0 +1,2 @@
+[console_scripts]
+st = todo.main:main
