@@ -15,7 +15,7 @@ A minimal command-line to-do app. Add, list, complete, and delete tasks with opt
 
 **1. Clone the repository:**
 ```bash
-git clone https://github.com/youruser/supertask.git
+git clone https://github.com/BrenoPT/supertask
 cd supertask/app
 ```
 
