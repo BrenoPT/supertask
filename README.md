@@ -1,17 +1,17 @@
-# Supertask
+# Supertask ⚡
 
 A minimal command-line to-do app. Add, list, complete, and delete tasks with optional due dates, stored locally in a SQLite database!
 
 ---
 
-## Dependencies
+## Dependencies 📦
 
 - Python 3.10+
 - [pipx](https://pipx.pypa.io/) (for installation)
 
 ---
 
-## Installation
+## Installation 🚀
 
 **1. Clone the repository:**
 ```bash
@@ -26,7 +26,7 @@ pipx install .
 
 ---
 
-## Usage
+## Usage 📖
 
 Run the app from anywhere in your terminal:
 ```bash
