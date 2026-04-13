@@ -1,6 +1,7 @@
 import sqlite3
 
 import functions
+from colorama import Fore
 
 con = sqlite3.connect("todo.db")
 cursor = con.cursor()
@@ -14,18 +15,19 @@ if (
     functions.initializeTable(cursor)
 
 functions.printGreeting()
-functions.checkNearDue(cursor)
 
 while True:
-    print("\nWhat do you wanna do?")
+    functions.checkNearDue(cursor)
 
-    print(f"{'add':<12}a")
+    print(Fore.WHITE + "\nWhat do you wanna do?")
+
+    print(Fore.BLUE + f"{'add':<12}a")
     print(f"{'list':<12}l")
     print(f"{'complete':<12}c")
     print(f"{'delete':<12}d")
     print(f"{'quit':<12}q")
 
-    command = input(">>> ").lower()
+    command = input(Fore.WHITE + ">>> ").lower()
     match command:
         case "add" | "a":
             functions.addTask(cursor, con)
@@ -39,3 +41,5 @@ while True:
             break
         case _:
             print("Invalid command")
+
+con.close()
