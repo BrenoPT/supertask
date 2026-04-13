@@ -20,15 +20,15 @@ while True:
     print("\nWhat do you wanna do?")
     command = input("(add, list, complete, delete, exit):").lower()
     match command:
-        case "add":
+        case "add" | "a":
             functions.addTask(cursor, con)
-        case "list":
+        case "list" | "l":
             functions.listTasks(cursor)
-        case "complete":
+        case "complete" | "c":
             functions.completeTask(cursor, con)
-        case "delete":
+        case "delete" | "d":
             functions.deleteTask(cursor, con)
-        case "exit":
+        case "exit" | "e":
             break
         case _:
             print("Invalid command")
