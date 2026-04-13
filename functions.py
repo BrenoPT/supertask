@@ -70,7 +70,7 @@ def listTasks(cursor):
     for i, task in enumerate(tasks, 1):
         print(f"\n{i}. [{task[0]}]")
         print(f"   {task[1]}")
-        print(f"   Due by: {task[2]}")
+        print(f"   {task[2]}")
 
 
 def completeTask(cursor, con):

@@ -18,7 +18,14 @@ functions.checkNearDue(cursor)
 
 while True:
     print("\nWhat do you wanna do?")
-    command = input("(add, list, complete, delete, exit):").lower()
+
+    print(f"{'add':<12}a")
+    print(f"{'list':<12}l")
+    print(f"{'complete':<12}c")
+    print(f"{'delete':<12}d")
+    print(f"{'quit':<12}q")
+
+    command = input(">>> ").lower()
     match command:
         case "add" | "a":
             functions.addTask(cursor, con)
@@ -28,7 +35,7 @@ while True:
             functions.completeTask(cursor, con)
         case "delete" | "d":
             functions.deleteTask(cursor, con)
-        case "exit" | "e":
+        case "quit" | "q":
             break
         case _:
             print("Invalid command")
