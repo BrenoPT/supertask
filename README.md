@@ -7,8 +7,6 @@ A minimal command-line to-do app. Add, list, complete, and delete tasks with opt
 ## Dependencies
 
 - Python 3.10+
-- [colorama](https://pypi.org/project/colorama/)
-- [dateparser](https://pypi.org/project/dateparser/)
 - [pipx](https://pipx.pypa.io/) (for installation)
 
 ---
