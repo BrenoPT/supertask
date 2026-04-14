@@ -288,8 +288,6 @@ def deleteTask(cursor, con):
         print(Fore.GREEN + "✓" + Fore.WHITE + " All clear! Nothing left to delete.")
         return
 
-    validIds = {str(row[0]) for row in tasks}
-
     for task in tasks:
         status = (
             Fore.GREEN + "✓" + Fore.WHITE if task[2] else Fore.RED + "✗" + Fore.WHITE
@@ -297,17 +295,22 @@ def deleteTask(cursor, con):
         print(Fore.WHITE + f"[{task[0]}] {task[1]} [{status}]")
 
     print(Fore.BLUE + "Enter one or more task ID to delete:" + Fore.WHITE)
-    taskIds = input().strip().lower().split()
-    if not taskIds:
+    taskIndices = input().strip().lower().split()
+    if not taskIndices:
         os.system("cls" if os.name == "nt" else "clear")
         print(Fore.YELLOW + "No IDs entered" + Fore.WHITE)
         return
-    notFound = [tid for tid in taskIds if tid not in validIds]
-    if notFound:
-        os.system("cls" if os.name == "nt" else "clear")
-        print(Fore.RED + f"Invalid ID(s): {', '.join(notFound)}" + Fore.WHITE)
-        print(Fore.YELLOW + "Nothing deleted" + Fore.WHITE)
-        return
+    if taskIndices == ["all"]:
+        taskIds = [str(row[0]) for row in tasks]
+    else:
+        validIndices = {str(i) for i in range(1, len(tasks) + 1)}
+        notFound = [tid for tid in taskIndices if tid not in validIndices]
+        if notFound:
+            os.system("cls" if os.name == "nt" else "clear")
+            print(Fore.RED + f"Invalid ID(s): {', '.join(notFound)}" + Fore.WHITE)
+            print(Fore.YELLOW + "Nothing deleted" + Fore.WHITE)
+            return
+        taskIds = [str(tasks[int(i) - 1][0]) for i in taskIndices]
     print(
         Fore.BLUE
         + f"Delete {len(taskIds)} task(s)? ("
@@ -326,13 +329,13 @@ def deleteTask(cursor, con):
         os.system("cls" if os.name == "nt" else "clear")
         print(Fore.YELLOW + "Deletion cancelled" + Fore.WHITE)
         return
-    for taskId in taskIds:
-        cursor.execute("DELETE FROM tasks WHERE id = ?", (taskId,))
+    for taskIndex in taskIds:
+        cursor.execute("DELETE FROM tasks WHERE id = ?", (taskIndex,))
     con.commit()
 
     os.system("cls" if os.name == "nt" else "clear")
     deletedTasks = [task[1] for task in tasks if str(task[0]) in taskIds]
-    print(Fore.GREEN + f"✓ Completed: {', '.join(deletedTasks)}" + Fore.WHITE)
+    print(Fore.GREEN + f"✓ Deleted: {', '.join(deletedTasks)}" + Fore.WHITE)
 
 
 def printHistory(cursor):
