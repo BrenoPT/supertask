@@ -1,7 +1,7 @@
 import os
 import random
 from pathlib import Path
-from sqlite3 import PARSE_DECLTYPES
+from sqlite3
 
 import dateparser
 from colorama import Fore, Style
@@ -40,7 +40,7 @@ def printGreeting():
         "Who tASKED?",
     ]
 
-    print(Fore.GREEN + random.choice(greetings))
+    print(random.choice(greetings))
 
 
 def printGoodbye():
@@ -62,7 +62,7 @@ def printGoodbye():
         "Don't Be A Stranger!",
         "Take Care!",
     ]
-    print(Fore.GREEN + random.choice(goodbyes))
+    print(random.choice(goodbyes))
 
 
 def checkNearDue(cursor):
@@ -81,16 +81,16 @@ def checkNearDue(cursor):
 def addTask(cursor, con):
     os.system("cls" if os.name == "nt" else "clear")
 
-    print("Enter task name:")
+    print(Fore.BLUE + "Enter task name:")
     name = input().strip()
     if not name:
         os.system("cls" if os.name == "nt" else "clear")
         print(Fore.RED + "Task name cannot be empty")
         print(Fore.YELLOW + "Task not created")
         return
-    print("Enter task description:")
+    print(Fore.BLUE + "Enter task description:")
     desc = input().strip()
-    print("Enter a due date (empty for none):")
+    print(Fore.BLUE + "Enter a due date (empty for none):")
     dueDate = input()
     parsed = dateparser.parse(dueDate) if dueDate else None
     parsedDueDate = parsed.strftime("%Y-%m-%d %H:%M") if parsed else None
@@ -111,7 +111,7 @@ def listTasks(cursor):
     cursor.execute("SELECT name, desc, due_date FROM tasks WHERE completed = 0")
     tasks = cursor.fetchall()
     if not tasks:
-        print(Fore.GREEN + "No pending tasks")
+        print("No pending tasks")
         return
 
     for i, task in enumerate(tasks, 1):
@@ -130,7 +130,7 @@ def listTasks(cursor):
 def completeTask(cursor, con):
     os.system("cls" if os.name == "nt" else "clear")
 
-    print("Select task to complete:")
+    print(Fore.BLUE + "Select task to complete:")
     cursor.execute("SELECT id, name FROM tasks WHERE completed = 0")
     tasks = cursor.fetchall()
 
@@ -167,7 +167,7 @@ def completeTask(cursor, con):
 def deleteTask(cursor, con):
     os.system("cls" if os.name == "nt" else "clear")
 
-    print("Select task to delete:")
+    print(Fore.BLUE + "Select task to delete:")
     cursor.execute("SELECT id, name, completed FROM tasks")
     tasks = cursor.fetchall()
 
@@ -184,7 +184,7 @@ def deleteTask(cursor, con):
         )
         print(f"[{task[0]}] {task[1]} [{status}]")
 
-    print("Enter one or more task ID to delete:")
+    print(Fore.BLUE + "Enter one or more task ID to delete:")
 
     taskIds = input().strip().split()
     if not taskIds:
@@ -213,10 +213,10 @@ def printHistory(cursor):
     tasks = cursor.fetchall()
 
     if not tasks:
-        print(Fore.YELLOW + "No task history")
+        print("No task history")
         return
 
-    print("Task History:")
+    print(Fore.BLUE + "Task History:")
 
     for task in tasks:
         status = (

@@ -21,16 +21,16 @@ def main():
     while True:
         functions.checkNearDue(cursor)
 
-        print(Fore.WHITE + "\nWhat do you wanna do?")
+        print("\nWhat do you wanna do?")
 
-        print(Fore.BLUE + f"{'add':<12}a")
+        print(f"{'add':<12}a")
         print(f"{'list':<12}l")
         print(f"{'complete':<12}c")
         print(f"{'delete':<12}d")
         print(f"{'history':<12}h")
         print(f"{'quit':<12}q")
 
-        command = input(Fore.WHITE + ">>> ").lower()
+        command = input(">>> ").lower()
         match command:
             case "add" | "a":
                 functions.addTask(cursor, con)
