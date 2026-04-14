@@ -1,4 +1,5 @@
 def main():
+    import os
     import sqlite3
 
     from colorama import Fore
@@ -19,18 +20,22 @@ def main():
     functions.printGreeting()
 
     while True:
+        pendingTasks = functions.getAmountOfTasks(cursor)
+        displayTasks = f"({pendingTasks})" if pendingTasks else ""
+
+        functions.checkOverDue(cursor)
         functions.checkNearDue(cursor)
 
-        print(Fore.WHITE + "\nWhat do you wanna do?")
+        print(Fore.BLUE + "\nWhat do you wanna do?" + Fore.WHITE)
 
-        print(Fore.BLUE + f"{'add':<12}a")
-        print(f"{'list':<12}l")
-        print(f"{'complete':<12}c")
-        print(f"{'delete':<12}d")
-        print(f"{'history':<12}h")
-        print(f"{'quit':<12}q")
+        print(f"{'add':<12}" + Fore.MAGENTA + "a" + Fore.WHITE)
+        print(f"{'list':<12}" + Fore.MAGENTA + "l" + Fore.WHITE + f" {displayTasks}")
+        print(f"{'complete':<12}" + Fore.MAGENTA + "c" + Fore.WHITE)
+        print(f"{'delete':<12}" + Fore.MAGENTA + "d" + Fore.WHITE)
+        print(f"{'history':<12}" + Fore.MAGENTA + "h" + Fore.WHITE)
+        print(f"{'quit':<12}" + Fore.MAGENTA + "q" + Fore.WHITE)
 
-        command = input(Fore.WHITE + ">>> ").lower()
+        command = input(">>> ").lower()
         match command:
             case "add" | "a":
                 functions.addTask(cursor, con)
@@ -45,7 +50,8 @@ def main():
             case "quit" | "q":
                 break
             case _:
-                print("Invalid command")
+                os.system("cls" if os.name == "nt" else "clear")
+                print(Fore.YELLOW + "Invalid command" + Fore.WHITE)
 
     con.close()
     functions.printGoodbye()
