@@ -2,10 +2,11 @@ import os
 import random
 import sqlite3
 from datetime import datetime, timedelta
+from numbers import Number
 from pathlib import Path
 
 import dateparser
-from colorama import Fore
+from colorama import Fore, Style
 
 
 def initializeTable(cursor):
@@ -136,7 +137,7 @@ def checkOverDue(cursor):
 
 def addTask(cursor, con):
     os.system("cls" if os.name == "nt" else "clear")
-    print("Create a new task\n")
+    print("Create a New Task\n")
     print(Fore.BLUE + "Enter task name:" + Fore.WHITE)
     name = input().strip()
     if not name:
@@ -233,7 +234,9 @@ def completeTask(cursor, con):
         print(f"[{i}] {task[1]}")
     print(Fore.BLUE + "Enter one or more task ID to complete:" + Fore.WHITE)
 
-    taskIndices = input().strip().split()
+    taskIndices = input().strip().lower().split()
+    if taskIndices == ["all"]:
+        taskIndices = [str(i) for i in range(1, len(tasks) + 1)]
     if not taskIndices:
         os.system("cls" if os.name == "nt" else "clear")
         print(Fore.YELLOW + "No IDs entered" + Fore.WHITE)
@@ -294,7 +297,7 @@ def deleteTask(cursor, con):
         print(Fore.WHITE + f"[{task[0]}] {task[1]} [{status}]")
 
     print(Fore.BLUE + "Enter one or more task ID to delete:" + Fore.WHITE)
-    taskIds = input().strip().split()
+    taskIds = input().strip().lower().split()
     if not taskIds:
         os.system("cls" if os.name == "nt" else "clear")
         print(Fore.YELLOW + "No IDs entered" + Fore.WHITE)
@@ -328,13 +331,14 @@ def deleteTask(cursor, con):
     con.commit()
 
     os.system("cls" if os.name == "nt" else "clear")
-    print(Fore.GREEN + f"{len(taskIds)} task(s) deleted successfully" + Fore.WHITE)
+    deletedTasks = [task[1] for task in tasks if str(task[0]) in taskIds]
+    print(Fore.GREEN + f"✓ Completed: {', '.join(deletedTasks)}" + Fore.WHITE)
 
 
 def printHistory(cursor):
     os.system("cls" if os.name == "nt" else "clear")
 
-    cursor.execute("SELECT id, name, completed FROM tasks")
+    cursor.execute("SELECT id, name, completed FROM tasks ORDER BY id DESC LIMIT 20")
     tasks = cursor.fetchall()
 
     if not tasks:
@@ -348,6 +352,9 @@ def printHistory(cursor):
             Fore.GREEN + "✓" + Fore.WHITE if task[2] else Fore.RED + "✗" + Fore.WHITE
         )
         print(f"[{task[0]}] {task[1]} [{status}]")
+    total = cursor.execute("SELECT COUNT(*) FROM tasks").fetchone()[0]
+
+    print(Style.DIM + f"Showing 20 most recent. {total} tasks total." + Style.RESET_ALL)
 
 
 def getDbPath():
