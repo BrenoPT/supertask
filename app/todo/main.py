@@ -9,6 +9,7 @@ def main():
     con = sqlite3.connect(functions.getDbPath())
     cursor = con.cursor()
 
+    # create tasks table if it doesn't exist
     if (
         cursor.execute(
             "SELECT name FROM sqlite_master WHERE type='table' AND name='tasks'"
@@ -20,6 +21,7 @@ def main():
     functions.printGreeting()
 
     while True:
+        # get amount of pending tasks and display it in the prompt if any
         pendingTasks = functions.getAmountOfTasks(cursor)
         displayTasks = f"({pendingTasks})" if pendingTasks else ""
 
