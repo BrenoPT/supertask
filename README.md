@@ -1,9 +1,3 @@
-
-
-https://github.com/user-attachments/assets/9fdd0dfd-ec10-4a5c-904f-72f39903c16c
-
-
-
 # Supertask ⚡
 
 A minimal command-line to-do app. Add, list, complete, and delete tasks with optional due dates, stored locally in a SQLite database!
