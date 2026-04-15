@@ -9,8 +9,9 @@ from colorama import Fore, Style
 
 
 def initializeTable(cursor):
-    cursor.execute(
-        "CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY, name TEXT, desc TEXT, completed INTEGER DEFAULT 0, due_date TEXT DEFAULT NULL)"
+    queryFetch(
+        cursor,
+        "CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY, name TEXT, desc TEXT, completed INTEGER DEFAULT 0, due_date TEXT DEFAULT NULL)",
     )
 
 
@@ -109,10 +110,11 @@ def printGoodbye():
 
 
 def checkDue(cursor):
-    cursor.execute(
-        "SELECT name, due_date FROM tasks WHERE due_date IS NOT NULL AND completed = 0 AND due_date < datetime('now', '+2 days') AND due_date >= datetime('now')"
+    tasks = queryFetch(
+        cursor,
+        "SELECT name, due_date FROM tasks WHERE due_date IS NOT NULL AND completed = 0 AND due_date < datetime('now', '+2 days') AND due_date >= datetime('now')",
     )
-    tasks = cursor.fetchall()
+
     if not tasks:
         return
 
@@ -120,10 +122,10 @@ def checkDue(cursor):
     for task in tasks:
         print(f"[{task[0]}] {task[1]}")
 
-    cursor.execute(
-        "SELECT name, due_date FROM tasks WHERE due_date IS NOT NULL AND completed = 0 AND due_date < datetime('now')"
+    tasks = queryFetch(
+        cursor,
+        "SELECT name, due_date FROM tasks WHERE due_date IS NOT NULL AND completed = 0 AND due_date < datetime('now')",
     )
-    tasks = cursor.fetchall()
     if not tasks:
         return
 
@@ -176,7 +178,8 @@ def addTask(cursor, con):
         print(Fore.YELLOW + "Task not created" + Fore.WHITE)
         return
 
-    cursor.execute(
+    queryFetch(
+        cursor,
         "INSERT INTO tasks (name, desc, due_date) VALUES (?, ?, ?)",
         (name, desc, parsedDueDate),
     )
@@ -188,8 +191,10 @@ def addTask(cursor, con):
 
 def listTasks(cursor):
     clearScreen()
-    cursor.execute("SELECT name, desc, due_date FROM tasks WHERE completed = 0")
-    tasks = cursor.fetchall()
+    tasks = queryFetch(
+        cursor,
+        "SELECT name, desc, due_date FROM tasks WHERE completed = 0",
+    )
     if not tasks:
         print(Fore.GREEN + "✓" + Fore.WHITE + " All clear! Nothing left to do.")
         return
@@ -219,18 +224,17 @@ def getDueDateColor(dueDateStr):
 
 
 def getAmountOfTasks(cursor):
-    tasks = cursor.execute("SELECT COUNT(*) FROM tasks WHERE completed = 0").fetchone()
+    tasks = queryFetch(cursor, "SELECT COUNT(*) FROM tasks WHERE completed = 0")[0][0]
     if tasks == 0:
         return
-    return tasks[0]
+    return tasks
 
 
 def completeTask(cursor, con):
     clearScreen()
 
     print(Fore.BLUE + "Select task to complete:" + Fore.WHITE)
-    cursor.execute("SELECT id, name, desc FROM tasks WHERE completed = 0")
-    tasks = cursor.fetchall()
+    tasks = queryFetch(cursor, "SELECT id, name, desc FROM tasks WHERE completed = 0")
 
     if not tasks:
         clearScreen()
@@ -275,7 +279,7 @@ def completeTask(cursor, con):
         print(Fore.YELLOW + "Completion cancelled" + Fore.WHITE)
         return
     for taskId in taskIds:
-        cursor.execute("UPDATE tasks SET completed = 1 WHERE id = ?", (taskId,))
+        queryFetch(cursor, "UPDATE tasks SET completed = 1 WHERE id = ?", (taskId,))
     con.commit()
 
     clearScreen()
@@ -287,8 +291,7 @@ def deleteTask(cursor, con):
     clearScreen()
 
     print(Fore.BLUE + "Select task to delete:" + Fore.WHITE)
-    cursor.execute("SELECT id, name, completed FROM tasks")
-    tasks = cursor.fetchall()
+    tasks = queryFetch(cursor, "SELECT id, name, completed FROM tasks")
 
     if not tasks:
         clearScreen()
@@ -339,7 +342,7 @@ def deleteTask(cursor, con):
         print(Fore.YELLOW + "Deletion cancelled" + Fore.WHITE)
         return
     for taskIndex in taskIds:
-        cursor.execute("DELETE FROM tasks WHERE id = ?", (taskIndex,))
+        queryFetch(cursor, "DELETE FROM tasks WHERE id = ?", (taskIndex,))
     con.commit()
 
     clearScreen()
@@ -350,8 +353,9 @@ def deleteTask(cursor, con):
 def printHistory(cursor):
     clearScreen()
 
-    cursor.execute("SELECT id, name, completed FROM tasks ORDER BY id DESC LIMIT 20")
-    tasks = cursor.fetchall()
+    tasks = queryFetch(
+        cursor, "SELECT id, name, completed FROM tasks ORDER BY id DESC LIMIT 20"
+    )
 
     if not tasks:
         print("No task history")
@@ -364,7 +368,7 @@ def printHistory(cursor):
             Fore.GREEN + "✓" + Fore.WHITE if task[2] else Fore.RED + "✗" + Fore.WHITE
         )
         print(f"[{task[0]}] {task[1]} [{status}]")
-    total = cursor.execute("SELECT COUNT(*) FROM tasks").fetchone()[0]
+    total = queryFetch(cursor, "SELECT COUNT(*) FROM tasks")[0][0]
 
     print(Style.DIM + f"Showing 20 most recent. {total} tasks total." + Style.RESET_ALL)
 
@@ -382,3 +386,8 @@ def getDbPath():
 
 def clearScreen():
     os.system("cls" if os.name == "nt" else "clear")
+
+
+def queryFetch(cursor, query, params=()):
+    cursor.execute(query, params)
+    return cursor.fetchall()
