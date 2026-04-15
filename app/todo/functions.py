@@ -15,7 +15,7 @@ def initializeTable(cursor):
 
 
 def printGreeting():
-    os.system("cls" if os.name == "nt" else "clear")
+    clearScreen()
     greetings = [
         "Welcome Back!",
         "Here We Go Again!",
@@ -67,7 +67,7 @@ def printGreeting():
 
 
 def printGoodbye():
-    os.system("cls" if os.name == "nt" else "clear")
+    clearScreen()
     goodbyes = [
         "See ya!",
         "Goodbye!",
@@ -133,12 +133,12 @@ def checkDue(cursor):
 
 
 def addTask(cursor, con):
-    os.system("cls" if os.name == "nt" else "clear")
+    clearScreen()
     print("Create a New Task\n")
     print(Fore.BLUE + "Enter task name:" + Fore.WHITE)
     name = input().strip()
     if not name:
-        os.system("cls" if os.name == "nt" else "clear")
+        clearScreen()
         print(Fore.RED + "Task name cannot be empty" + Fore.WHITE)
         print(Fore.YELLOW + "Task not created" + Fore.WHITE)
         return
@@ -172,7 +172,7 @@ def addTask(cursor, con):
     )
     confirm = input().strip().lower()
     if confirm != "y" and confirm != "":
-        os.system("cls" if os.name == "nt" else "clear")
+        clearScreen()
         print(Fore.YELLOW + "Task not created" + Fore.WHITE)
         return
 
@@ -182,12 +182,12 @@ def addTask(cursor, con):
     )
     con.commit()
 
-    os.system("cls" if os.name == "nt" else "clear")
+    clearScreen()
     print(Fore.GREEN + "✓" + Fore.WHITE + " Task added successfully.")
 
 
 def listTasks(cursor):
-    os.system("cls" if os.name == "nt" else "clear")
+    clearScreen()
     cursor.execute("SELECT name, desc, due_date FROM tasks WHERE completed = 0")
     tasks = cursor.fetchall()
     if not tasks:
@@ -226,14 +226,14 @@ def getAmountOfTasks(cursor):
 
 
 def completeTask(cursor, con):
-    os.system("cls" if os.name == "nt" else "clear")
+    clearScreen()
 
     print(Fore.BLUE + "Select task to complete:" + Fore.WHITE)
     cursor.execute("SELECT id, name, desc FROM tasks WHERE completed = 0")
     tasks = cursor.fetchall()
 
     if not tasks:
-        os.system("cls" if os.name == "nt" else "clear")
+        clearScreen()
         print(Fore.GREEN + "✓" + Fore.WHITE + " All clear! Nothing left to complete.")
         return
 
@@ -245,13 +245,13 @@ def completeTask(cursor, con):
     if taskIndices == ["all"]:
         taskIndices = [str(i) for i in range(1, len(tasks) + 1)]
     if not taskIndices:
-        os.system("cls" if os.name == "nt" else "clear")
+        clearScreen()
         print(Fore.YELLOW + "No IDs entered" + Fore.WHITE)
         return
     validIndices = {str(i) for i in range(1, len(tasks) + 1)}
     notFound = [tid for tid in taskIndices if tid not in validIndices]
     if notFound:
-        os.system("cls" if os.name == "nt" else "clear")
+        clearScreen()
         print(Fore.RED + f"Invalid ID(s): {', '.join(notFound)}" + Fore.WHITE)
         print(Fore.YELLOW + "Nothing updated" + Fore.WHITE)
         return
@@ -271,27 +271,27 @@ def completeTask(cursor, con):
     )
     confirm = input().strip().lower()
     if confirm != "y" and confirm != "":
-        os.system("cls" if os.name == "nt" else "clear")
+        clearScreen()
         print(Fore.YELLOW + "Completion cancelled" + Fore.WHITE)
         return
     for taskId in taskIds:
         cursor.execute("UPDATE tasks SET completed = 1 WHERE id = ?", (taskId,))
     con.commit()
 
-    os.system("cls" if os.name == "nt" else "clear")
+    clearScreen()
     completedTasks = [task[1] for task in tasks if str(task[0]) in taskIds]
     print(Fore.GREEN + f"✓ Completed: {', '.join(completedTasks)}" + Fore.WHITE)
 
 
 def deleteTask(cursor, con):
-    os.system("cls" if os.name == "nt" else "clear")
+    clearScreen()
 
     print(Fore.BLUE + "Select task to delete:" + Fore.WHITE)
     cursor.execute("SELECT id, name, completed FROM tasks")
     tasks = cursor.fetchall()
 
     if not tasks:
-        os.system("cls" if os.name == "nt" else "clear")
+        clearScreen()
         print(Fore.GREEN + "✓" + Fore.WHITE + " All clear! Nothing left to delete.")
         return
 
@@ -306,7 +306,7 @@ def deleteTask(cursor, con):
     print(Fore.BLUE + "Enter one or more task ID to delete:" + Fore.WHITE)
     taskIndices = input().strip().lower().split()
     if not taskIndices:
-        os.system("cls" if os.name == "nt" else "clear")
+        clearScreen()
         print(Fore.YELLOW + "No IDs entered" + Fore.WHITE)
         return
     if taskIndices == ["all"]:
@@ -315,7 +315,7 @@ def deleteTask(cursor, con):
         validIndices = {str(i) for i in range(1, len(tasks) + 1)}
         notFound = [tid for tid in taskIndices if tid not in validIndices]
         if notFound:
-            os.system("cls" if os.name == "nt" else "clear")
+            clearScreen()
             print(Fore.RED + f"Invalid ID(s): {', '.join(notFound)}" + Fore.WHITE)
             print(Fore.YELLOW + "Nothing deleted" + Fore.WHITE)
             return
@@ -335,20 +335,20 @@ def deleteTask(cursor, con):
     )
     confirm = input().strip().lower()
     if confirm != "y" and confirm != "":
-        os.system("cls" if os.name == "nt" else "clear")
+        clearScreen()
         print(Fore.YELLOW + "Deletion cancelled" + Fore.WHITE)
         return
     for taskIndex in taskIds:
         cursor.execute("DELETE FROM tasks WHERE id = ?", (taskIndex,))
     con.commit()
 
-    os.system("cls" if os.name == "nt" else "clear")
+    clearScreen()
     deletedTasks = [task[1] for task in tasks if str(task[0]) in taskIds]
     print(Fore.GREEN + f"✓ Deleted: {', '.join(deletedTasks)}" + Fore.WHITE)
 
 
 def printHistory(cursor):
-    os.system("cls" if os.name == "nt" else "clear")
+    clearScreen()
 
     cursor.execute("SELECT id, name, completed FROM tasks ORDER BY id DESC LIMIT 20")
     tasks = cursor.fetchall()
@@ -378,3 +378,7 @@ def getDbPath():
     dbDir = base / "supertask"
     dbDir.mkdir(parents=True, exist_ok=True)
     return dbDir / "todo.db"
+
+
+def clearScreen():
+    os.system("cls" if os.name == "nt" else "clear")
