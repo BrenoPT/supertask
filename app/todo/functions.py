@@ -352,8 +352,9 @@ def executeQuery(cursor, query, params=()):
 
 def confirmAction(action, taskIds):
     print(
-        Fore.BLUE
-        + f"{action} {len(taskIds)} task(s)? ("
+        Fore.BLUE + f"{action} {len(taskIds)} task(s)? ("
+        if len(taskIds) > 1
+        else f"{action} this task? ("
         + Fore.GREEN
         + "Y"
         + Fore.BLUE
