@@ -204,13 +204,17 @@ def listTasks(cursor):
 
 def getDueDateColor(dueDateStr):
     dueDate = dateparser.parse(dueDateStr) if dueDateStr else None
+    now = datetime.now()
+    # if no due date, return white
     if not dueDate:
         return Fore.WHITE
-    now = datetime.now()
-    if dueDate <= now:
-        return Fore.RED
-    elif dueDate <= now + timedelta(days=2):
+    # if due date is within 2 days, return yellow
+    elif dueDate <= now + timedelta(days=2) and dueDate >= now:
         return Fore.YELLOW
+    # if due date is past, return red
+    if dueDate < now:
+        return Fore.RED
+    # fallback
     return Fore.WHITE
 
 
