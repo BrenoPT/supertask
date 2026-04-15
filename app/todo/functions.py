@@ -108,7 +108,7 @@ def printGoodbye():
     print(random.choice(goodbyes))
 
 
-def checkNearDue(cursor):
+def checkDue(cursor):
     cursor.execute(
         "SELECT name, due_date FROM tasks WHERE due_date IS NOT NULL AND completed = 0 AND due_date < datetime('now', '+2 days') AND due_date >= datetime('now')"
     )
@@ -120,8 +120,6 @@ def checkNearDue(cursor):
     for task in tasks:
         print(f"[{task[0]}] {task[1]}")
 
-
-def checkOverDue(cursor):
     cursor.execute(
         "SELECT name, due_date FROM tasks WHERE due_date IS NOT NULL AND completed = 0 AND due_date < datetime('now')"
     )

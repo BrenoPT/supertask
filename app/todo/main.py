@@ -23,8 +23,7 @@ def main():
         pendingTasks = functions.getAmountOfTasks(cursor)
         displayTasks = f"({pendingTasks})" if pendingTasks else ""
 
-        functions.checkOverDue(cursor)
-        functions.checkNearDue(cursor)
+        functions.checkDue(cursor)
 
         print(Fore.BLUE + "\nWhat do you wanna do?" + Fore.WHITE)
 
