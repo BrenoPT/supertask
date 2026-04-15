@@ -299,12 +299,10 @@ def deleteTask(cursor, con):
         return
 
     for i, task in enumerate(tasks, 1):
-        print(f"[{i}] {task[1]}")
-    for task in tasks:
         status = (
             Fore.GREEN + "✓" + Fore.WHITE if task[2] else Fore.RED + "✗" + Fore.WHITE
         )
-        print(Fore.WHITE + f"[{task[0]}] {task[1]} [{status}]")
+        print(Fore.WHITE + f"[{i}] {task[1]} [{status}]")
 
     print(Fore.BLUE + "Enter one or more task ID to delete:" + Fore.WHITE)
     taskIndices = input().strip().lower().split()
