@@ -2,7 +2,6 @@ import os
 import random
 import sqlite3
 from datetime import datetime, timedelta
-from numbers import Number
 from pathlib import Path
 
 import dateparser
@@ -222,7 +221,7 @@ def completeTask(cursor, con):
     os.system("cls" if os.name == "nt" else "clear")
 
     print(Fore.BLUE + "Select task to complete:" + Fore.WHITE)
-    cursor.execute("SELECT id, name FROM tasks WHERE completed = 0")
+    cursor.execute("SELECT id, name, desc FROM tasks WHERE completed = 0")
     tasks = cursor.fetchall()
 
     if not tasks:
@@ -231,7 +230,7 @@ def completeTask(cursor, con):
         return
 
     for i, task in enumerate(tasks, 1):
-        print(f"[{i}] {task[1]}")
+        print(f"[{i}] {task[1]}\n{task[2]}\n" if task[2] else f"[{i}] {task[1]}\n")
     print(Fore.BLUE + "Enter one or more task ID to complete:" + Fore.WHITE)
 
     taskIndices = input().strip().lower().split()
@@ -288,6 +287,8 @@ def deleteTask(cursor, con):
         print(Fore.GREEN + "✓" + Fore.WHITE + " All clear! Nothing left to delete.")
         return
 
+    for i, task in enumerate(tasks, 1):
+        print(f"[{i}] {task[1]}")
     for task in tasks:
         status = (
             Fore.GREEN + "✓" + Fore.WHITE if task[2] else Fore.RED + "✗" + Fore.WHITE
