@@ -9,7 +9,7 @@ from colorama import Fore, Style
 
 
 def initializeTable(cursor):
-    queryFetch(
+    executeQuery(
         cursor,
         "CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY, name TEXT, desc TEXT, completed INTEGER DEFAULT 0, due_date TEXT DEFAULT NULL)",
     )
@@ -110,7 +110,7 @@ def printGoodbye():
 
 
 def checkDue(cursor):
-    tasks = queryFetch(
+    tasks = executeQuery(
         cursor,
         "SELECT name, due_date FROM tasks WHERE due_date IS NOT NULL AND completed = 0 AND due_date < datetime('now', '+2 days') AND due_date >= datetime('now')",
     )
@@ -122,7 +122,7 @@ def checkDue(cursor):
     for task in tasks:
         print(f"[{task[0]}] {task[1]}")
 
-    tasks = queryFetch(
+    tasks = executeQuery(
         cursor,
         "SELECT name, due_date FROM tasks WHERE due_date IS NOT NULL AND completed = 0 AND due_date < datetime('now')",
     )
@@ -159,26 +159,10 @@ def addTask(cursor, con):
     print(Fore.BLUE + f"\nName: " + Fore.WHITE + f"{name}")
     print(Fore.BLUE + f"Description: " + Fore.WHITE + f"{desc}")
     print(Fore.BLUE + f"Due date: " + Fore.WHITE + f"{parsedDueDate}")
-    print(
-        Fore.BLUE
-        + "Confirm task ("
-        + Fore.GREEN
-        + "Y"
-        + Fore.BLUE
-        + "/"
-        + Fore.RED
-        + "n"
-        + Fore.BLUE
-        + ")"
-        + Fore.WHITE
-    )
-    confirm = input().strip().lower()
-    if confirm != "y" and confirm != "":
-        clearScreen()
-        print(Fore.YELLOW + "Task not created" + Fore.WHITE)
+    if not confirmAction("Create", []):
         return
 
-    queryFetch(
+    executeQuery(
         cursor,
         "INSERT INTO tasks (name, desc, due_date) VALUES (?, ?, ?)",
         (name, desc, parsedDueDate),
@@ -191,7 +175,7 @@ def addTask(cursor, con):
 
 def listTasks(cursor):
     clearScreen()
-    tasks = queryFetch(
+    tasks = executeQuery(
         cursor,
         "SELECT name, desc, due_date FROM tasks WHERE completed = 0",
     )
@@ -224,7 +208,7 @@ def getDueDateColor(dueDateStr):
 
 
 def getAmountOfTasks(cursor):
-    tasks = queryFetch(cursor, "SELECT COUNT(*) FROM tasks WHERE completed = 0")[0][0]
+    tasks = executeQuery(cursor, "SELECT COUNT(*) FROM tasks WHERE completed = 0")[0][0]
     if tasks == 0:
         return
     return tasks
@@ -234,7 +218,7 @@ def completeTask(cursor, con):
     clearScreen()
 
     print(Fore.BLUE + "Select task to complete:" + Fore.WHITE)
-    tasks = queryFetch(cursor, "SELECT id, name, desc FROM tasks WHERE completed = 0")
+    tasks = executeQuery(cursor, "SELECT id, name, desc FROM tasks WHERE completed = 0")
 
     if not tasks:
         clearScreen()
@@ -260,26 +244,10 @@ def completeTask(cursor, con):
         print(Fore.YELLOW + "Nothing updated" + Fore.WHITE)
         return
     taskIds = [str(tasks[int(i) - 1][0]) for i in taskIndices]
-    print(
-        Fore.BLUE
-        + f"Complete {len(taskIds)} task(s)? ("
-        + Fore.GREEN
-        + "Y"
-        + Fore.BLUE
-        + "/"
-        + Fore.RED
-        + "n"
-        + Fore.BLUE
-        + ")"
-        + Fore.WHITE
-    )
-    confirm = input().strip().lower()
-    if confirm != "y" and confirm != "":
-        clearScreen()
-        print(Fore.YELLOW + "Completion cancelled" + Fore.WHITE)
+    if not confirmAction("Complete", taskIds):
         return
     for taskId in taskIds:
-        queryFetch(cursor, "UPDATE tasks SET completed = 1 WHERE id = ?", (taskId,))
+        executeQuery(cursor, "UPDATE tasks SET completed = 1 WHERE id = ?", (taskId,))
     con.commit()
 
     clearScreen()
@@ -291,7 +259,7 @@ def deleteTask(cursor, con):
     clearScreen()
 
     print(Fore.BLUE + "Select task to delete:" + Fore.WHITE)
-    tasks = queryFetch(cursor, "SELECT id, name, completed FROM tasks")
+    tasks = executeQuery(cursor, "SELECT id, name, completed FROM tasks")
 
     if not tasks:
         clearScreen()
@@ -321,26 +289,10 @@ def deleteTask(cursor, con):
             print(Fore.YELLOW + "Nothing deleted" + Fore.WHITE)
             return
         taskIds = [str(tasks[int(i) - 1][0]) for i in taskIndices]
-    print(
-        Fore.BLUE
-        + f"Delete {len(taskIds)} task(s)? ("
-        + Fore.GREEN
-        + "Y"
-        + Fore.BLUE
-        + "/"
-        + Fore.RED
-        + "n"
-        + Fore.BLUE
-        + ")"
-        + Fore.WHITE
-    )
-    confirm = input().strip().lower()
-    if confirm != "y" and confirm != "":
-        clearScreen()
-        print(Fore.YELLOW + "Deletion cancelled" + Fore.WHITE)
+    if not confirmAction("Delete", taskIds):
         return
     for taskIndex in taskIds:
-        queryFetch(cursor, "DELETE FROM tasks WHERE id = ?", (taskIndex,))
+        executeQuery(cursor, "DELETE FROM tasks WHERE id = ?", (taskIndex,))
     con.commit()
 
     clearScreen()
@@ -351,7 +303,7 @@ def deleteTask(cursor, con):
 def printHistory(cursor):
     clearScreen()
 
-    tasks = queryFetch(
+    tasks = executeQuery(
         cursor, "SELECT id, name, completed FROM tasks ORDER BY id DESC LIMIT 20"
     )
 
@@ -366,7 +318,7 @@ def printHistory(cursor):
             Fore.GREEN + "✓" + Fore.WHITE if task[2] else Fore.RED + "✗" + Fore.WHITE
         )
         print(f"[{task[0]}] {task[1]} [{status}]")
-    total = queryFetch(cursor, "SELECT COUNT(*) FROM tasks")[0][0]
+    total = executeQuery(cursor, "SELECT COUNT(*) FROM tasks")[0][0]
 
     print(Style.DIM + f"Showing 20 most recent. {total} tasks total." + Style.RESET_ALL)
 
@@ -386,6 +338,29 @@ def clearScreen():
     os.system("cls" if os.name == "nt" else "clear")
 
 
-def queryFetch(cursor, query, params=()):
+def executeQuery(cursor, query, params=()):
     cursor.execute(query, params)
+    # if not INSERT, UPDATE or DELETE, returns empty list, harmless to use for SELECT queries
     return cursor.fetchall()
+
+
+def confirmAction(action, taskIds):
+    print(
+        Fore.BLUE
+        + f"{action} {len(taskIds)} task(s)? ("
+        + Fore.GREEN
+        + "Y"
+        + Fore.BLUE
+        + "/"
+        + Fore.RED
+        + "n"
+        + Fore.BLUE
+        + ")"
+        + Fore.WHITE
+    )
+    confirm = input().strip().lower()
+    if confirm != "y" and confirm != "":
+        clearScreen()
+        print(Fore.YELLOW + "Action cancelled, nothing changed" + Fore.WHITE)
+        return 0
+    return 1
