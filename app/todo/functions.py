@@ -149,7 +149,13 @@ def addTask(cursor, con):
     print(Fore.BLUE + "Enter a due date (empty for none):" + Fore.WHITE)
     dueDate = input()
     parsed = dateparser.parse(dueDate) if dueDate else None
-    parsedDueDate = parsed.strftime("%Y-%m-%d %H:%M") if parsed else None
+    parsedDueDate = parsed.strftime("%Y-%m-%d %H:%M") if parsed else ""
+    if not parsed:
+        print(
+            Fore.YELLOW
+            + "\nBeware: Date not recognized, defaulting no due date"
+            + Fore.WHITE
+        )
     print(Fore.BLUE + f"\nName: " + Fore.WHITE + f"{name}")
     print(Fore.BLUE + f"Description: " + Fore.WHITE + f"{desc}")
     print(Fore.BLUE + f"Due date: " + Fore.WHITE + f"{parsedDueDate}")
