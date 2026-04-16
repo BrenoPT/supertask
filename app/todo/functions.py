@@ -113,7 +113,7 @@ def checkDue(cursor):
     # check if any tasks are due soon
     tasks = executeQuery(
         cursor,
-        "SELECT name, due_date FROM tasks WHERE due_date IS NOT NULL AND completed = 0 AND due_date < datetime('now', '+2 days') AND due_date >= datetime('now')",
+        "SELECT name, due_date FROM tasks WHERE due_date IS NOT NULL AND completed = 0 AND due_date <= datetime('now', '+2 days', 'localtime') AND due_date >= datetime('now', 'localtime')",
     )
     if not tasks:
         return
@@ -124,7 +124,7 @@ def checkDue(cursor):
     # check if any tasks are overdue
     tasks = executeQuery(
         cursor,
-        "SELECT name, due_date FROM tasks WHERE due_date IS NOT NULL AND completed = 0 AND due_date < datetime('now')",
+        "SELECT name, due_date FROM tasks WHERE due_date IS NOT NULL AND completed = 0 AND due_date < datetime('now', 'localtime')",
     )
     if not tasks:
         return
