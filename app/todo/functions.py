@@ -151,7 +151,7 @@ def addTask(cursor, con):
     parsed = dateparser.parse(dueDate) if dueDate else None
     parsedDueDate = parsed.strftime("%Y-%m-%d %H:%M") if parsed else ""
     # warn if date not recognized
-    if not parsed:
+    if not parsed and dueDate != "":
         print(
             Fore.YELLOW
             + "\nBeware: Date not recognized, defaulting no due date"
