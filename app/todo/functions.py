@@ -189,7 +189,16 @@ def listTasks(cursor):
         dueDateStr = task[2] if task[2] else False
         status = getDueDateColor(dueDateStr)
         delta = getDelta(dueDateStr)
-        print(Fore.BLUE + f"{i}. " + status + f"{task[0]}")
+        print(
+            Fore.BLUE
+            + f""
+            + Fore.BLUE
+            + f"{i}"
+            + Fore.WHITE
+            + ". "
+            + status
+            + f"{task[0]}"
+        )
         print(f"   {task[1]}" if task[1] else "   (No description)")
         print(f"   {task[2] if task[2] else '(No due date)'} {delta}" + Fore.WHITE)
 
@@ -264,7 +273,11 @@ def completeTask(cursor, con):
         return
     # display tasks with relative indices
     for i, task in enumerate(tasks, 1):
-        print(f"[{i}] {task[1]}\n{task[2]}\n" if task[2] else f"[{i}] {task[1]}\n")
+        print(
+            f"[" + Fore.BLUE + f"{i}" + Fore.WHITE + f"] {task[1]}\n{task[2]}\n"
+            if task[2]
+            else f"[" + Fore.BLUE + f"{i}" + Fore.WHITE + f"] {task[1]}\n"
+        )
     print(Fore.BLUE + "Enter one or more task ID to complete:" + Fore.WHITE)
     taskIndices = input().strip().lower().split()
     if taskIndices == ["all"]:
@@ -309,7 +322,14 @@ def deleteTask(cursor, con):
         status = (
             Fore.GREEN + "✓" + Fore.WHITE if task[2] else Fore.RED + "✗" + Fore.WHITE
         )
-        print(Fore.WHITE + f"[{i}] {task[1]} [{status}]")
+        print(
+            Fore.WHITE
+            + f"["
+            + Fore.BLUE
+            + f"{i}"
+            + Fore.WHITE
+            + f"] {task[1]} [{status}]"
+        )
     print(Fore.BLUE + "Enter one or more task ID to delete:" + Fore.WHITE)
     taskIndices = input().strip().lower().split()
     if not taskIndices:
@@ -347,17 +367,32 @@ def printHistory(cursor):
     if not tasks:
         print("No task history")
         return
+    numDone = sum(task[2] for task in tasks)
+    numNotDone = len(tasks) - numDone
+    totalTasks = len(tasks)
     print(Fore.BLUE + "Task History:" + Fore.WHITE)
-    for task in tasks:
+    print(
+        Style.DIM
+        + f"Showing 20 most recent. {totalTasks} tasks total."
+        + Style.RESET_ALL
+    )
+    for i, task in enumerate(tasks, 1):
         status = (
             Fore.GREEN + "✓" + Fore.WHITE if task[2] else Fore.RED + "✗" + Fore.WHITE
         )
-        print(f"[{task[0]}] {task[1]} [{status}]")
-    total = executeQuery(cursor, "SELECT COUNT(*) FROM tasks")[0][
-        0
-    ]  # get total number of tasks
-
-    print(Style.DIM + f"Showing 20 most recent. {total} tasks total." + Style.RESET_ALL)
+        print(f"[" + Fore.BLUE + f"{i}" + Fore.WHITE + f"] {task[1]} [{status}]")
+    print(
+        Style.DIM
+        + f"{numDone} Done "
+        + Fore.GREEN
+        + "✓"
+        + Fore.WHITE
+        + f" | {numNotDone} Not Done "
+        + Fore.RED
+        + "✗"
+        + Fore.WHITE
+        + Style.RESET_ALL
+    )
 
 
 def getDbPath():
