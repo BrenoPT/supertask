@@ -382,10 +382,13 @@ def executeQuery(cursor, query, params=()):
 
 
 def confirmAction(action, taskIds):
+    if len(taskIds) > 1:  # inline if statement was causing some weird bug
+        message = f"{action} {len(taskIds)} tasks"
+    else:
+        message = f"{action} task"
     print(
-        Fore.BLUE + f"{action} {len(taskIds)} task(s)? ("
-        if len(taskIds) > 1
-        else f"{action} this task? ("
+        Fore.BLUE
+        + f"{message}? ("
         + Fore.GREEN
         + "Y"
         + Fore.BLUE
