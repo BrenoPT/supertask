@@ -188,9 +188,40 @@ def listTasks(cursor):
     for i, task in enumerate(tasks, 1):
         dueDateStr = task[2] if task[2] else False
         status = getDueDateColor(dueDateStr)
+        delta = getDelta(dueDateStr)
         print(Fore.BLUE + f"{i}. " + status + f"{task[0]}")
         print(f"   {task[1]}" if task[1] else "   (No description)")
-        print(f"   {task[2] if task[2] else '(No due date)'}" + Fore.WHITE)
+        print(f"   {task[2] if task[2] else '(No due date)'} {delta}" + Fore.WHITE)
+
+
+def getDelta(dueDateStr):
+    dueDate = dateparser.parse(dueDateStr) if dueDateStr else None
+    now = datetime.now()
+    if not dueDate:
+        return ""
+    deltaSeconds = int((dueDate - now).total_seconds())
+    if deltaSeconds > 86400:
+        time = f"{deltaSeconds // 86400}"
+        if time == "1":
+            return "(1 day)"
+        return f"({time} days)"
+    elif deltaSeconds > 3600:
+        time = f"{deltaSeconds // 3600}"
+        if time == "1":
+            return "(1 hour)"
+        return f"({time} hours)"
+    elif deltaSeconds > 60:
+        time = f"{deltaSeconds // 60}"
+        if time == "1":
+            return "(1 minute)"
+        return f"({time} minutes)"
+    elif deltaSeconds > 0:
+        time = f"{deltaSeconds}"
+        if time == "1":
+            return "(1 second)"
+        return f"({time} seconds)"
+    else:
+        time = "Overdue"
 
 
 def getDueDateColor(dueDateStr):
